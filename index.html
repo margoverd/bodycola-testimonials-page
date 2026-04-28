@@ -44,7 +44,7 @@
       .testimonials__filters {
         display: flex;
         gap: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         position: relative;
         z-index: 100;
       }
@@ -58,7 +58,7 @@
         color: var(--text-main);
         padding: 10px 20px;
         border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 16px;
         font-weight: 500;
         cursor: pointer;
@@ -66,7 +66,7 @@
         justify-content: space-between;
         align-items: center;
         gap: 12px;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
       }
       .custom-dropdown__selected:hover {
         border-color: var(--primary-red);
@@ -78,7 +78,7 @@
         height: 6px;
         background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%231a1a1a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
-        transition: transform 0.3s;
+        transition: transform 0.2s;
       }
       .custom-dropdown.is-open .custom-dropdown__selected::after {
         transform: rotate(180deg);
@@ -148,7 +148,7 @@
       .testimonials__slider-wrapper {
         position: relative;
         width: 100%;
-        padding-bottom: 40px;
+        padding-bottom: 30px;
       }
 
       .swiper {
@@ -194,16 +194,16 @@
       }
 
       .swiper-pagination-bullet {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         background: #d9d9d9;
         opacity: 1;
-        transition: 0.3s;
+        transition: 0.2s;
         margin: 0 !important;
       }
       .swiper-pagination-bullet-active {
         background: var(--primary-red) !important;
-        width: 25px;
+        width: 22px;
         border-radius: 5px;
       }
 
@@ -229,7 +229,9 @@
         line-height: 1.4;
       }
 
+      /* КНОПКА С ЗАГРУЗКОЙ */
       .btn-more {
+        position: relative;
         background: transparent;
         border: 1px solid var(--primary-red);
         color: var(--primary-red);
@@ -239,12 +241,52 @@
         font-family: inherit;
         font-weight: 600;
         cursor: pointer;
-        transition: 0.3s;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 200px;
+        overflow: hidden;
       }
 
-      .btn-more:hover {
+      .btn-more:hover:not(.is-loading) {
         background: var(--primary-red);
         color: #fff;
+      }
+
+      /* Стили спиннера */
+      .btn-more .loader {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid currentColor;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        animation: rotation 0.8s linear infinite;
+      }
+
+      .btn-more.is-loading {
+        background: var(--primary-red);
+        color: #fff;
+        cursor: wait;
+        pointer-events: none; /* Чтобы не кликали дважды */
+      }
+
+      .btn-more.is-loading .loader {
+        display: inline-block;
+      }
+
+      .btn-more.is-loading .btn-text {
+        display: none;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       /* НАВИГАЦИЯ */
@@ -255,17 +297,17 @@
         width: 34px;
         cursor: pointer;
         z-index: 10;
-        transition: opacity 0.3s;
+        transition: opacity 0.2s;
       }
       .testimonials__nav.swiper-button-disabled {
         opacity: 0.2;
         cursor: default;
       }
       .testimonials__nav--prev {
-        left: -66px;
+        left: -63px;
       }
       .testimonials__nav--next {
-        right: -66px;
+        right: -63px;
       }
 
       @media (max-width: 1024px) {
@@ -309,6 +351,7 @@
         .btn-more {
           font-size: 14px;
           padding: 12px 32px;
+          min-width: 180px;
         }
       }
     </style>
@@ -399,7 +442,10 @@
                 <p id="last-slide-text" class="last-slide-text">
                   Хотите прочитать остальные отзывы?
                 </p>
-                <button class="btn-more">Загрузить еще</button>
+                <button class="btn-more" id="load-more-btn">
+                  <span class="btn-text">Загрузить еще</span>
+                  <span class="loader"></span>
+                </button>
               </div>
             </div>
           </div>
@@ -472,6 +518,19 @@
         },
       });
 
+      // ЛОГИКА КНОПКИ "ЗАГРУЗИТЬ ЕЩЕ"
+      const loadMoreBtn = document.getElementById("load-more-btn");
+      loadMoreBtn.addEventListener("click", function () {
+        this.classList.add("is-loading");
+        setTimeout(() => {
+          // Здесь будет добавления новых слайдов
+          this.classList.remove("is-loading");
+          alert(
+            "Демонстрация подгрузки: в финальной версии здесь будет реализована загрузка следующих 10 отзывов без перезагрузки страницы.",
+          );
+        }, 500);
+      });
+
       function setupDropdowns() {
         const doctorItems = document.querySelectorAll(
           "#doctor-dropdown .custom-dropdown__item",
@@ -527,14 +586,14 @@
         finalSlide.style.display = "flex";
 
         if (!selectedDoctor || selectedDoctor === "Все врачи") {
-          textElement.innerHTML = `У нас еще более <strong>${stats.total}</strong> счастливых пациентов. <br>Показать остальные отзывы?`;
+          textElement.innerHTML = `У нас еще <strong>${stats.total}</strong> счастливых пациентов! <br>Показать остальные отзывы?`;
         } else {
           const pureName = selectedDoctor.split("\n")[0].trim();
           const count = stats.doctors[pureName] || 0;
           if (count === 0) {
             finalSlide.style.display = "none";
           } else {
-            textElement.innerHTML = `У врача <strong>${pureName}</strong> <br>еще <strong>${count}</strong> отзывов. Показать?`;
+            textElement.innerHTML = `У врача <strong>${pureName}</strong> <br>еще <strong>${count}</strong> отзывов. Показать еще?`;
           }
         }
         swiper.update();
